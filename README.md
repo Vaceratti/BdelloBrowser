@@ -12,7 +12,8 @@ Per-gene view combining:
 - Genome annotation (RefSeq GCF_000196175.1)
 - Proteome dynamics across the predatory cycle (Lai et al. 2025)
 - Secretome (Tyson et al. 2024)
-- RNA-seq: own dataset (PRJNA1156087) + Karunker et al. 2013 (incl. TSS/operons, sRNA)
+- Transcriptome dynamics in attack phase and growth phase (Karunker et al. 2013, incl. TSS/operons, sRNA)
+- Transcriptom dynamic across predatory cycle vs _K. pneumoniae_ (GEO: GSE112863)
 - Tn-seq fitness (Duncan et al. 2019)
 - c-di-GMP binding candidates (Rotem et al. 2015)
 - COG functional categories, UniProt/InterPro/AlphaFold/STRING/KEGG links
