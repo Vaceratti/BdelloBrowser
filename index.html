@@ -2636,26 +2636,35 @@ function readTrackParamsFromUrl(){
   return null;
 }
 
-function sparkPath(expr, w, h, pad){
+function sparkPath(expr, w, h, pad, mode, xFrac){
+  // Same y-scaling rule as the gene-card charts (fullChart): log2FC always includes 0,
+  // abundance is fitted tight to the data; range is then widened to the same "nice" tick
+  // bounds the card uses, so a table sparkline and its gene-card chart have the same shape.
+  mode = mode || 'log2fc';
   const vals = expr.map(v => v===null? 0 : v);
-  const min = Math.min(...vals, 0), max = Math.max(...vals, 0.1);
+  const lo = mode==='log2fc' ? Math.min(...vals, 0) : Math.min(...vals);
+  const hi = mode==='log2fc' ? Math.max(...vals, 0.1) : Math.max(...vals);
+  const tk = niceTicks(lo, hi, 4);
+  const min = tk[0], max = tk[tk.length-1];
   const range = (max-min) || 1;
   const n = vals.length;
   const step = (w - pad*2) / (n-1);
-  let pts = vals.map((v,i) => {
-    const x = pad + i*step;
+  const pts = vals.map((v,i) => {
+    const x = xFrac ? pad + xFrac(i)*(w-pad*2) : pad + i*step;
     const y = h - pad - ((v-min)/range)*(h-pad*2);
     return [x,y];
   });
+  pts.zeroY = (min < 0 && max > 0) ? h - pad - ((0-min)/range)*(h-pad*2) : null;
   return pts;
 }
 
 function miniSpark(expr){
   if(!expr) return '<span style="color:var(--text-faint);font-family:\'IBM Plex Mono\',monospace;font-size:11.5px;">no data</span>';
   const w=60,h=22,pad=2;
-  const pts = sparkPath(expr,w,h,pad);
+  const pts = sparkPath(expr,w,h,pad,CHART_MODE,(i)=>0.65*tpFrac(i)+0.35*(i/(expr.length-1)));
   let d = 'M'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L');
-  const segs = pts.slice(0,-1).map((p,i)=>{
+  const zl = (CHART_MODE==='log2fc' && pts.zeroY!==null) ? `<line x1="${pad}" y1="${pts.zeroY.toFixed(1)}" x2="${w-pad}" y2="${pts.zeroY.toFixed(1)}" stroke="#4a515b" stroke-width="1" stroke-dasharray="2,2"/>` : '';
+  const segs = zl + pts.slice(0,-1).map((p,i)=>{
     const p2 = pts[i+1];
     const k = TP_PHASE4_MAP()[DATA.timepoints[i]];
     const col = k ? PHASE4_INFO[k].color : '#7a828d';
@@ -3760,9 +3769,15 @@ function computeKlebCorrelations(locus, topN, mode){
 function miniSparkRna(vals){
   if(!vals) return '<span style="color:var(--text-faint);font-family:\'IBM Plex Mono\',monospace;font-size:11.5px;">no data</span>';
   const w=60,h=22,pad=2;
-  const pts = sparkPath(vals,w,h,pad);
+  // mirror the gene-card Klebsiella chart: K0 reference (log2FC = 0) is the first point and
+  // x is real elapsed minutes, so the table shape matches the card
+  const mins = [0].concat(KLEB_DE_TIMEPOINTS.map(tp=>parseInt(tp.slice(1),10)));
+  const series = [0].concat(vals.map(v=>v===null?0:v));
+  const maxMin = mins[mins.length-1];
+  const pts = sparkPath(series,w,h,pad,'log2fc',(i)=>mins[i]/maxMin);
   let d = 'M'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L');
-  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><path d="${d}" fill="none" stroke="var(--teal)" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+  const zl = pts.zeroY!==null ? `<line x1="${pad}" y1="${pts.zeroY.toFixed(1)}" x2="${w-pad}" y2="${pts.zeroY.toFixed(1)}" stroke="#4a515b" stroke-width="1" stroke-dasharray="2,2"/>` : '';
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${zl}<path d="${d}" fill="none" stroke="var(--teal)" stroke-width="1.4" stroke-linecap="round"/></svg>`;
 }
 
 function multiChartKleb(series, mode){
