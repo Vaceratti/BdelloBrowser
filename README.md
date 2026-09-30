@@ -4,7 +4,7 @@ Interactive multi-omics browser for *Bdellovibrio bacteriovorus* HD100 -
 genome, transcriptome, proteome, Tn-seq in a single static HTML file,
 no backend required.
 
-**Live version:** https://<user>.github.io/<repo>/
+**Live version:** [https://<user>.github.io/<repo>/](https://vaceratti.github.io/BdelloBrowser/)
 
 ## What it does
 
