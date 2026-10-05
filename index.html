@@ -1945,7 +1945,7 @@
       <div style="display:flex;align-items:center;gap:8px;">
         <div style="position:relative;flex:1;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a8b0ba" stroke-width="2" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);opacity:0.5;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input id="search" type="text" style="width:100%;" placeholder="locus, gene, or keyword &ndash; comma-separate for multiple (e.g. ftsZ, Bd0063, dynamin)" autocomplete="off">
+          <input id="search" type="text" style="width:100%;" placeholder="locus, gene, UniProt or keyword &ndash; comma-separate for multiple (e.g. ftsZ, Bd0063, Q6MRS1, dynamin)" autocomplete="off">
         </div>
         <button class="smallbtn" id="browser-batch-btn" title="Paste multiple locus tags or gene symbols">📋 Paste list</button>
       </div>
@@ -2015,7 +2015,7 @@
 
   <main id="main-table" style="display:none;flex-direction:column;">
     <div class="tablecontrols">
-      <input class="tbl-searchbox" id="tbl-search" type="text" placeholder="locus/gene/description, comma-separated (e.g. ftsZ, Bd0063)">
+      <input class="tbl-searchbox" id="tbl-search" type="text" placeholder="locus/gene/UniProt/description, comma-separated (e.g. ftsZ, Bd0063, Q6MRS1)">
       <button class="smallbtn" id="tbl-batch-btn" title="Paste a multi-gene list to filter or compare">📋 Paste list</button>
       <div class="msel" id="msel-phase">
         <button class="msel-btn" type="button" id="msel-phase-btn">proteome pattern: all</button>
@@ -2228,6 +2228,7 @@
         <div class="tbl-legend-item"><b>Secretome</b><span>Detected in the empty-bdelloplast secretome, with unique peptide count. Tyson et al. 2024.</span></div>
         <div class="tbl-legend-item"><b>c-di-GMP</b><span>Candidate c-di-GMP-binding protein: known/predicted (KOP) or novel. Rotem et al. 2015.</span></div>
         <div class="tbl-legend-item"><b>TSS / sRNA</b><span>Transcription start site (own or operon-internal) and/or proximity to a small RNA. Karunker et al. 2013.</span></div>
+        <div class="tbl-legend-item"><b>UniProt</b><span>UniProt accession of the protein (reference proteome UP000008080), linked to the entry. Searchable.</span></div>
         <div class="tbl-legend-item"><b>Metabolic model (iCH457)</b><span>Flux-balance-analysis prediction: attack-phase model (AP), growth-phase model (GP), or shared. &#9733; = essential by FBA. Herencias et al. 2020, in silico only.</span></div>
       </div>
     </div>
@@ -2254,6 +2255,7 @@
             <th data-col="reg" title="Karunker I et al. PLoS ONE 2013;8(4):e61850, Table S2 and Table 2. doi:10.1371/journal.pone.0061850"><span class="th-drag-handle" draggable="true" title="Drag to reorder column">&#8942;&#8942;</span><span class="th-label">TSS / sRNA (Karunker 2013)</span><button class="th-filter-btn" type="button" data-filter="tbl-reg-filter" title="Filter: TSS / sRNA (Karunker 2013, doi:10.1371/journal.pone.0061850)">&#9662;</button></th>
             <th data-sort="_metabNRxn" data-col="metab" title="Herencias C, Salgado-Briegas S, Prieto MA, Nogales J. PLoS Comput Biol 2020;16(9):e1007646. doi:10.1371/journal.pcbi.1007646. Model prediction from flux balance analysis, independent of the Karunker transcriptome. Star = also tagged essential (knockout abolishes growth in FBA) in the intracellular and/or free-living lifestyle sub-model."><span class="th-drag-handle" draggable="true" title="Drag to reorder column">&#8942;&#8942;</span><span class="th-label">Metabolic model (iCH457, in silico)</span><button class="th-filter-btn" type="button" data-filter="tbl-metabphase-filter,tbl-metablife-filter" title="Filter: Metabolic model (iCH457, doi:10.1371/journal.pcbi.1007646) - phase &amp; essentiality">&#9662;</button></th>
             <th data-sort="_pdbN" data-col="pdb" title="Experimental 3D structures deposited in the PDB (UniProt cross-references): method, resolution, which residues were solved (often only a domain), oligomeric state and title. Click the chip to expand. The purple link is the AlphaFold DB PREDICTED model, not an experiment."><span class="th-drag-handle" draggable="true" title="Drag to reorder column">&#8942;&#8942;</span><span class="th-label">PDB structure / AlphaFold</span><button class="th-filter-btn" type="button" data-filter="tbl-pdb-filter" title="Filter: PDB structure">&#9662;</button></th>
+            <th data-sort="up" data-col="uniprot" title="UniProt accession (reference proteome UP000008080). Click to open the UniProt entry. Searchable in the box above."><span class="th-drag-handle" draggable="true" title="Drag to reorder column">&#8942;&#8942;</span><span class="th-label">UniProt</span></th>
           </tr>
         </thead>
         <tbody id="tbl-body"></tbody>
@@ -2303,7 +2305,7 @@
         </label>
       </div>
       <div class="plots-ctrl-group">
-        <input type="text" id="plots-highlight-input" placeholder="highlight genes: dnaA, Bd0108, ftsZ ... (paste a list)" title="Several genes: separate with comma, space or semicolon. Exact locus/gene name first; partial match only if nothing matches exactly." style="background:var(--bg-deep);border:1px solid var(--line);color:var(--text);border-radius:2px;padding:5px 8px;font-family:'IBM Plex Mono',monospace;font-size:12px;width:220px;">
+        <input type="text" id="plots-highlight-input" placeholder="highlight genes: dnaA, Bd0108, Q6MRS1 ... (paste a list)" title="Several genes: separate with comma, space or semicolon. Exact locus/gene name first; partial match only if nothing matches exactly." style="background:var(--bg-deep);border:1px solid var(--line);color:var(--text);border-radius:2px;padding:5px 8px;font-family:'IBM Plex Mono',monospace;font-size:12px;width:220px;">
         <label style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--text-dim);cursor:pointer;" title="Mark every gene in the comparison basket on the plot, in its basket colour"><input type="checkbox" id="plots-basket-hl" checked> basket genes</label>
         <span id="circ-ctrl" style="display:none;align-items:center;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text-dim);flex-wrap:wrap;">
           <button class="smallbtn" id="circ-rings-btn" type="button" title="Choose which timepoints / datasets are drawn as rings (one or several)">Rings: all &#9662;</button>
@@ -2496,7 +2498,7 @@
       </div>
       <div class="basket-controls">
         <div class="basket-add-wrap" id="basket-add-wrap">
-          <input class="basket-add-box" id="basket-add-input" type="text" placeholder="+ Add locus/gene..." autocomplete="off">
+          <input class="basket-add-box" id="basket-add-input" type="text" placeholder="+ Add locus/gene/UniProt..." autocomplete="off">
           <button class="smallbtn" id="basket-btn-add-locus" title="Add locus tag or gene symbol to basket" style="font-weight:600;">+ Add</button>
           <div id="basket-add-suggest" class="basket-suggest-box" style="display:none;" role="listbox"></div>
         </div>
@@ -5834,7 +5836,7 @@ function runSearch(q){
     return;
   } else {
     results = DATA.genes.filter(g => {
-      if(multiTermMatch(g, q, ['l','g','p','fn']) || (qClean && qClean !== q && multiTermMatch(g, qClean, ['g']))) return true;
+      if(multiTermMatch(g, q, ['l','g','p','fn','up','usym','upp']) || (qClean && qClean !== q && multiTermMatch(g, qClean, ['g']))) return true;
       if(multiTermMatch({goStr: g.go?g.go.join(' '):''}, q, ['goStr'])) return true;
       if(Array.isArray(g.syn) && g.syn.some(s => s && (s.toLowerCase().includes(q.toLowerCase()) || (qClean && s.toLowerCase().includes(qClean.toLowerCase()))))) return true;
       if(typeof GENE_NAMES !== 'undefined' && GENE_NAMES[g.l] && GENE_NAMES[g.l].some(it => it.n && (it.n.toLowerCase().includes(q.toLowerCase()) || (qClean && it.n.toLowerCase().includes(qClean.toLowerCase()))))) return true;
@@ -5880,7 +5882,7 @@ function selectGene(locus){
   document.getElementById('detail-content').innerHTML = `
     <div class="d-top">
       <div>
-        <div class="d-locus">${g.l}${g.rs && g.rs!==g.l ? ' &middot; '+g.rs : ''}${g.pid ? ' &middot; <a href="'+ncbiProtLink+'" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-style:dotted;" title="Open '+g.pid+' at NCBI Protein">'+g.pid+'</a>' : ''}</div>
+        <div class="d-locus">${g.l}${g.rs && g.rs!==g.l ? ' &middot; '+g.rs : ''}${g.pid ? ' &middot; <a href="'+ncbiProtLink+'" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-style:dotted;" title="Open '+g.pid+' at NCBI Protein">'+g.pid+'</a>' : ''}${g.up ? ' &middot; <a href="'+upLink+'" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-style:dotted;" title="Open '+g.up+' at UniProt">'+g.up+'</a>' : ''}</div>
         <div class="d-gene">${g.g ? '<i>'+escapeHtml(g.g)+'</i>' : escapeHtml(g.l)}${geneSynHtml(g)}</div>
         <div class="d-product">${escapeHtml(g.p || 'no product description')}</div>
         ${geneNameNote(g.l)}
@@ -7455,7 +7457,7 @@ function tblApplyFilters(){
     }
   }
   if(tblFilters.q){
-    rows = rows.filter(g => multiTermMatch(g, tblFilters.q, ['l','g','p']));
+    rows = rows.filter(g => multiTermMatch(g, tblFilters.q, ['l','g','p','up','usym','upp']));
   }
   if(tblFilters.binLoci){
     rows = rows.filter(g => tblFilters.binLoci.has(g.l));
@@ -7545,6 +7547,7 @@ function renderTable(){
         <td>${g._tss || g._srna ? `<span class="phase-chip" style="color:#de6835;border-color:#de6835;" title="Karunker et al. 2013, PLoS ONE 8:e61850 (Table S2 / Table 2).">${[g._tss ? (g._tssPrimary ? 'TSS (own)' : 'TSS (operon)') : null, g._srna ? 'near sRNA' : null].filter(Boolean).join(' + ')}</span>` : '<span class="cell-num">\u2013</span>'}</td>
         <td>${g._metab ? `<span class="phase-chip" style="color:${g._metabPhase==='A'?'#de6835':g._metabPhase==='G'?'#4ec196':'#7a828d'};border-color:${g._metabPhase==='A'?'#de6835':g._metabPhase==='G'?'#4ec196':'#7a828d'};" title="${g._metabNRxn} reaction${g._metabNRxn===1?'':'s'} in iCH457${g._metabSubsystem?' \u00b7 '+escapeHtml(g._metabSubsystem)+(g._metabNSubsystems>1?' (+'+(g._metabNSubsystems-1)+' more)':''):''}${g._metabLifestyle?' \u00b7 essential: '+({I:'intracellular only',F:'free-living only',C:'both (common)'}[g._metabLifestyle]):''}. Herencias et al. 2020, PLoS Comput Biol.">${g._metabPhase==='A'?'AP-model':g._metabPhase==='G'?'GP-model':'shared'}${g._metabLifestyle?' \u2605':''}</span>` : '<span class="cell-num">\u2013</span>'}</td>
         <td class="cell-wraptext">${g._pdbN ? pdbCellHtml(g) : '\u2013'}${g.up ? `<div style="margin-top:3px;"><a href="https://alphafold.ebi.ac.uk/entry/${g.up}" target="_blank" rel="noopener" style="color:#a98cd9;font-size:11px;" title="AlphaFold DB: PREDICTED model, not an experimental structure">AlphaFold model (predicted)</a></div>` : ''}</td>
+        <td class="cell-num">${g.up ? `<a href="https://www.uniprot.org/uniprotkb/${g.up}/entry" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-style:dotted;" title="Open ${g.up} at UniProt">${g.up}</a>` : '\u2013'}</td>
       `;
     }
     tr.addEventListener('click', (e)=>{
@@ -8275,6 +8278,17 @@ function renderPathwaysPanel(){
   }
 }
 
+function pwGeneSearchText(locus){
+  const g = DATA.genes.find(x=>x.l===locus);
+  if(!g) return String(locus).toLowerCase();
+  return [g.l, g.rs, g.g, g.up, g.usym, g.p, g.upp].filter(Boolean).join(' ').toLowerCase();
+}
+function pwGeneTip(locus){
+  const g = DATA.genes.find(x=>x.l===locus);
+  if(!g) return locus;
+  return [g.p || '', g.up ? 'UniProt ' + g.up : ''].filter(Boolean).join(' | ');
+}
+
 function pwGeneLabel(locus){
   const g = DATA.genes.find(x=>x.l===locus);
   if(!g) return locus;
@@ -8777,17 +8791,34 @@ function pwRenderDetailCard(title, upLoci, downLoci, totalLoci, opts){
   card.style.display = 'flex';
   document.getElementById('pw-detail-title').textContent = title;
   const listSection = (title, loci, cls) => loci.length ? `
-    <div style="margin-bottom:10px;">
-      <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-faint);margin-bottom:4px;">${title} (${loci.length})</div>
+    <div class="pw-sec" style="margin-bottom:10px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-faint);margin-bottom:4px;">${title} (<span class="pw-sec-n" data-total="${loci.length}">${loci.length}</span>)</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;">
-        ${loci.map(l => `<span class="smallbtn ${cls}" data-pwjump="${l}" style="cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11.5px;">${escapeHtml(pwGeneLabel(l))}</span>`).join('')}
+        ${loci.map(l => `<span class="smallbtn ${cls}" data-pwjump="${l}" data-pwq="${escapeHtml(pwGeneSearchText(l))}" title="${escapeHtml(pwGeneTip(l))}" style="cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11.5px;">${escapeHtml(pwGeneLabel(l))}</span>`).join('')}
       </div>
     </div>` : '';
   document.getElementById('pw-detail-body').innerHTML = (opts && opts.extra ? opts.extra : '') +
+    `<input type="search" id="pw-detail-filter" class="tbl-searchbox" placeholder="filter genes: locus, gene, UniProt (e.g. Q6MRS1), product" autocomplete="off" style="width:100%;max-width:420px;margin-bottom:10px;">` +
     listSection((opts && opts.upLabel) || 'Up', upLoci, 'pw-sig-up') +
     listSection((opts && opts.downLabel) || 'Down', downLoci, 'pw-sig-down') +
     listSection((opts && opts.allLabel) || 'All genes in category (unfiltered)', totalLoci, '');
   card.scrollIntoView({behavior:'smooth', block:'nearest'});
+  const pwFilt = document.getElementById('pw-detail-filter');
+  if(pwFilt) pwFilt.addEventListener('input', ()=>{
+    const terms = pwFilt.value.toLowerCase().split(/[\s,;]+/).filter(Boolean);
+    document.querySelectorAll('#pw-detail-body .pw-sec').forEach(sec=>{
+      let vis = 0;
+      sec.querySelectorAll('[data-pwjump]').forEach(ch=>{
+        const hay = ch.dataset.pwq || '';
+        const ok = !terms.length || terms.some(t => hay.includes(t));
+        ch.style.display = ok ? '' : 'none';
+        if(ok) vis++;
+      });
+      const n = sec.querySelector('.pw-sec-n');
+      if(n) n.textContent = terms.length ? vis + ' of ' + n.dataset.total : n.dataset.total;
+      sec.style.display = (terms.length && !vis) ? 'none' : '';
+    });
+  });
   document.querySelectorAll('#pw-detail-body [data-pwjump]').forEach(el=>{
     el.addEventListener('click', ()=>{
       const target = el.dataset.pwjump;
@@ -10976,9 +11007,9 @@ function renderGlobalPlots(){
   const hlExact = new Set(), hlNotFound = [];
   hlTerms.forEach(t => {
     let hit = false;
-    DATA.genes.forEach(g => { if(g.l.toLowerCase()===t || (g.g && g.g.toLowerCase()===t)){ hlExact.add(g.l); hit = true; } });
+    DATA.genes.forEach(g => { if(g.l.toLowerCase()===t || (g.g && g.g.toLowerCase()===t) || (g.up && g.up.toLowerCase()===t)){ hlExact.add(g.l); hit = true; } });
     if(!hit){
-      DATA.genes.forEach(g => { if(g.l.toLowerCase().includes(t) || (g.g && g.g.toLowerCase().includes(t))){ hlExact.add(g.l); hit = true; } });
+      DATA.genes.forEach(g => { if(g.l.toLowerCase().includes(t) || (g.g && g.g.toLowerCase().includes(t)) || (g.up && g.up.toLowerCase().includes(t))){ hlExact.add(g.l); hit = true; } });
     }
     if(!hit) hlNotFound.push(t);
   });
@@ -11576,17 +11607,19 @@ function downloadPlotSVG(){
       const altList = (typeof GENE_NAMES !== 'undefined' && GENE_NAMES[g.l]) ? GENE_NAMES[g.l] : [];
       const altNames = altList.map(it => (it.n || '').toLowerCase());
       const altCleans = altNames.map(a => cleanGeneSymbol(a).toLowerCase());
-      const allSyms = [symbol, symClean, ...syns, ...synCleans, ...altNames, ...altCleans].filter(Boolean);
-      const prod = (g.p || g.fn || '').toLowerCase();
+      const upAcc = (g.up || '').toLowerCase();
+      const upSym = (g.usym || '').toLowerCase();
+      const allSyms = [symbol, symClean, upSym, ...syns, ...synCleans, ...altNames, ...altCleans].filter(Boolean);
+      const prod = ((g.p || g.fn || '') + ' ' + (g.upp || '')).toLowerCase();
       const pubN = (typeof PUB_APPROVED !== 'undefined' && PUB_APPROVED[g.l]) ? PUB_APPROVED[g.l].length : (g._pubN || 0);
 
       let score = 999;
 
-      if(locus === q || locus === qClean){
+      if(locus === q || locus === qClean || (upAcc && upAcc === q)){
         score = 10;
       } else if(allSyms.some(s => s === q || s === qClean)){
         score = 20;
-      } else if(locus.startsWith(q) || locus.startsWith(qClean)){
+      } else if(locus.startsWith(q) || locus.startsWith(qClean) || (upAcc && q.length >= 3 && upAcc.startsWith(q))){
         score = 30;
       } else if(allSyms.some(s => s.startsWith(q) || s.startsWith(qClean))){
         score = 40 - Math.min(pubN * 2, 8) + (symbol ? Math.max(0, (symbol.length - q.length) * 0.1) : 0);
@@ -11596,7 +11629,7 @@ function downloadPlotSVG(){
         score = 70;
       } else if(prod.includes(q) || (qEn && prod.includes(qEn))){
         score = 80 - Math.min(pubN, 5);
-      } else if(locus.includes(q)){
+      } else if(locus.includes(q) || (upAcc && q.length >= 3 && upAcc.includes(q))){
         score = 90;
       } else if(typeof PUB_APPROVED !== 'undefined' && PUB_APPROVED[g.l]){
         const pubHit = PUB_APPROVED[g.l].some(p => (p.note && (p.note.toLowerCase().includes(q) || (qClean && p.note.toLowerCase().includes(qClean)))) ||
@@ -11659,6 +11692,7 @@ function downloadPlotSVG(){
         <div class="basket-suggest-top">
           <span class="basket-suggest-locus">${g.l}</span>
           ${sym}
+          ${g.up ? `<span class="basket-suggest-syn" title="UniProt accession">${escapeHtml(g.up)}</span>` : ''}
           ${isPinned ? '<span class="basket-suggest-pinned">&#10003; in basket</span>' : ''}
         </div>
         <div class="basket-suggest-prod">${prod}</div>
